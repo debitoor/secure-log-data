@@ -21,18 +21,21 @@ const SENSATIVE_PATH = {
 const TOKEN = /token=[^;]*/;
 const TOKEN_ENC = /token%3[^&]*/;
 
-function sanitize(val) {
-	if (!this.isLeaf || !val) {
-		return;
-	} else if (
-		schemaError(this.key, this.parent && this.parent.node) ||
-		SENSITIVE.indexOf(this.key.toLowerCase()) !== -1 ||
-		isSensativePath(this.key, this.parent && this.parent.path) ) {
-		this.update('***');
-	} else if (TOKEN.test(val)) {
-		this.update(val.replace(TOKEN, 'token=***'));
-	} else if (TOKEN_ENC.test(val)) {
-		this.update(val.replace(TOKEN_ENC, 'token%3***'));
+function sanitize({ sensitive = [] } = {}) {
+	sensitive = sensitive.map(key => key.toLowerCase()).concat(SENSITIVE)
+	return function (val) {
+		if (!this.isLeaf || !val) {
+			return;
+		} else if (
+			schemaError(this.key, this.parent && this.parent.node, sensitive) ||
+			sensitive.indexOf(this.key.toLowerCase()) !== -1 ||
+			isSensativePath(this.key, this.parent && this.parent.path)) {
+			this.update('***');
+		} else if (TOKEN.test(val)) {
+			this.update(val.replace(TOKEN, 'token=***'));
+		} else if (TOKEN_ENC.test(val)) {
+			this.update(val.replace(TOKEN_ENC, 'token%3***'));
+		}
 	}
 }
 
@@ -51,14 +54,14 @@ function isSensativePath(key, path) {
 	return false;
 }
 
-function schemaError(key, obj) {
+function schemaError(key, obj, sensitive) {
 	return key === 'value' &&
 		obj &&
 		obj.message &&
 		typeof obj.property === 'string' &&
-		SENSITIVE.indexOf(obj.property.toLowerCase()) !== -1;
+		sensitive.indexOf(obj.property.toLowerCase()) !== -1;
 }
 
-module.exports = function(data) {
-	return traverse(data).map(sanitize);
+module.exports = function(data, options = {}) {
+	return traverse(data).map(sanitize(options));
 };
