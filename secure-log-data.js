@@ -21,14 +21,14 @@ const SENSATIVE_PATH = {
 const TOKEN = /token=[^;]*/;
 const TOKEN_ENC = /token%3[^&]*/;
 
-function sanitize({ sensitive = [] } = {}) {
-	sensitive = sensitive.map(key => key.toLowerCase()).concat(SENSITIVE);
+function sanitize({ sensitiveKeys = [] } = {}) {
+	sensitiveKeys = sensitiveKeys.map(key => key.toLowerCase()).concat(SENSITIVE);
 	return function (val) {
 		if (!this.isLeaf || !val) {
 			return;
 		} else if (
-			schemaError(this.key, this.parent && this.parent.node, sensitive) ||
-			sensitive.indexOf(this.key.toLowerCase()) !== -1 ||
+			schemaError(this.key, this.parent && this.parent.node, sensitiveKeys) ||
+			sensitiveKeys.indexOf(this.key.toLowerCase()) !== -1 ||
 			isSensativePath(this.key, this.parent && this.parent.path)) {
 			this.update('***');
 		} else if (TOKEN.test(val)) {

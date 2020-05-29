@@ -188,7 +188,7 @@ describe('secure-data.spec.js', function() {
 					user: 'bob'
 				}
 			}
-		}, { sensitive: ['mySensitiveField'] })).to.eql({
+		}, { sensitiveKeys: ['mySensitiveField'] })).to.eql({
 			headers: {
 				'mySensitiveField': '***',
 				'x-credentials': '***',
