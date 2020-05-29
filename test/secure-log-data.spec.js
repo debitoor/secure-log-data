@@ -203,6 +203,6 @@ describe('secure-data.spec.js', function() {
 				}
 			}
 		});
-	})
+	});
 
 });

@@ -22,7 +22,7 @@ const TOKEN = /token=[^;]*/;
 const TOKEN_ENC = /token%3[^&]*/;
 
 function sanitize({ sensitive = [] } = {}) {
-	sensitive = sensitive.map(key => key.toLowerCase()).concat(SENSITIVE)
+	sensitive = sensitive.map(key => key.toLowerCase()).concat(SENSITIVE);
 	return function (val) {
 		if (!this.isLeaf || !val) {
 			return;
@@ -36,7 +36,7 @@ function sanitize({ sensitive = [] } = {}) {
 		} else if (TOKEN_ENC.test(val)) {
 			this.update(val.replace(TOKEN_ENC, 'token%3***'));
 		}
-	}
+	};
 }
 
 function isSensativePath(key, path) {
